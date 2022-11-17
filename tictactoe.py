@@ -3,6 +3,7 @@ Tic Tac Toe Player
 """
 import copy
 import math
+import random
 
 X = "X"
 O = "O"
@@ -55,12 +56,13 @@ def result(board, action):
     Returns the board that results from making move (i, j) on the board.
     """
 
-    i, j = action
+    i= action[0]
+    j = action[1]
 
     if i not in range(3) or j not in range(3):
-        raise ValueError('Invalid Co-ordinates')
+        raise ValueError('Invalid Co-ordinates',i,j)
     if board[i][j] != EMPTY:
-        raise ValueError('Non-empty Co-ordinates')
+        raise ValueError('Non-empty Co-ordinates',i,j)
     board_copy = copy.deepcopy(board)
     board_copy[i][j] = player(board)
 
@@ -107,5 +109,41 @@ def utility(board):
 def minimax(board):
     """
     Returns the optimal action for the current player on the board.
+    X is Maximizer, O is Minimizer.
     """
-    raise NotImplementedError
+
+    action_set=actions(board)
+    depth=len(action_set)
+    if len(action_set)==9:
+        return (0,0)
+    if player(board)==X:
+        return maxim(board,depth)[0]
+    if player(board)==O:
+        return minim(board,depth)[0]
+        
+def minim(board,depth):
+    if depth<1:
+        return (None,utility(board))
+    action_set=actions(board)
+    best_action=None
+    best_score=1
+    for action in action_set:
+        score = maxim(board,depth-1)
+        if score[1]<best_score:
+            best_score=score[1]
+            best_action=action
+    return (best_action,best_score)
+def maxim(board,depth):
+    if depth<1:
+        return (None,utility(board))
+    action_set=actions(board)
+    best_action=None
+    best_score=-1
+    for action in action_set:
+        score = minim(board,depth-1)
+        if score[1]>best_score:  
+            best_score=score[1]
+            best_action=action
+    return (best_action,best_score)
+
+
